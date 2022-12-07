@@ -1,54 +1,63 @@
+import datetime
 import hashlib
-import random
-
-# Gerar um novo bloco
-
 
 class Block:
-    def __init__(self, data, previous_hash) -> None:
+    blockNo = 0
+    data = None
+    next = None
+    hash = None
+    nonce = 0
+    previous_hash = 0x0
+    timestamp = datetime.datetime.now()
+
+    def __init__(self, data):
         self.data = data
-        self.previous_hash = previous_hash
-        self.next_block_challenge = random.getrandbits(160)
-        self.challenge_result = 0
-        self.hash = 0
 
-    def __str__(self) -> str:
-        return f'{self.data}-{self.previous_hash}-{self.next_block_challenge}-{self.challenge_result}'
+    def hash(self):
+        h = hashlib.sha256()
+        h.update(
+        str(self.nonce).encode() +
+        str(self.data).encode() +
+        str(self.previous_hash).encode() +
+        str(self.timestamp).encode() +
+        str(self.blockNo).encode()
+        )
+        return h.hexdigest()
 
-    def is_valid(self):
-        return hashlib.sha1(str(self)) == self.hash
+    def __str__(self):
+        return "Block Hash: " + str(self.hash()) + "\nBlockNo: " + str(self.blockNo) + "\nBlock Data: " + str(self.data) + "\nHashes: " + str(self.nonce) + "\n--------------"
 
-    def updateHash(self):
-        self.hash = hashlib.sha1(self)
+class Blockchain:
 
+    diff = 20
+    maxNonce = 2**32
+    target = 2 ** (256-diff)
 
-class BlockChain:
-    def __init__(self) -> None:
-        self.chain = list()
+    block = Block("Genesis")
+    dummy = head = block
 
-    def get_block(self, i=0):
-        return self.chain[i]
+    def add(self, block):
 
-    def add_new_block(self, data: str):
+        block.previous_hash = self.block.hash()
+        block.blockNo = self.block.blockNo + 1
 
-        last_block = self.chain[-1]
+        self.block.next = block
+        self.block = self.block.next
 
-        # criacao do bloco novo com os novos dados e o hash anterior
-        new_block = Block(data, last_block.hash)
+    def mine(self, block):
+        for n in range(self.maxNonce):
+            if int(block.hash(), 16) <= self.target:
+                self.add(block)
+                print(block)
+                break
+            else:
+                block.nonce += 1
 
-        # calcular o desafio
-        new_block.challenge_result = solve_challenge(
-            last_block.next_block_challenge)  # cacular o desafio
-        new_block.updateHash()
-        self.chain.append(new_block)
+blockchain = Blockchain()
 
+for n in range(10):
+    blockchain.mine(Block("Block " + str(n+1)))
 
-def solve_challenge(block_hash, challenge):
-    # Encontrar um valor x que acrescido ao block_hash seja menor que o challenge.
-    # do something
-    # encontrar o x do hash(x + block) === challenge.
-    return x
-
-
-# usar a lib time begin = time.time()
-end = time.time() - begin()
+while blockchain.head != None:
+    print(blockchain.head)
+    blockchain.head = blockchain.head.next

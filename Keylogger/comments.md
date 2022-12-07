@@ -1,3 +1,14 @@
 # Atividade 1 VF
 
-- Provavelmente so vai funcionar em ambiente linux.
+## How to run on windows
+
+- Necessário instalar as dependencias:
+  - win32console
+  - win32gui
+  - pythoncom
+  - pyHook
+
+## How to run on linux
+
+- Necessário instalar a dependencia:
+  - pyxhook
