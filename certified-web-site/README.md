@@ -21,6 +21,8 @@ npm i
 yarn dev
 ```
 
+- Irá rodar como: https://localhost:5173
+
 - caso use npm, use:
 
 ```bash
